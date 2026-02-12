@@ -49,7 +49,7 @@
         <h2 class="font-press-start text-lg sm:text-xl text-pink-400 mb-3">YOU DID IT! 🎉</h2>
         <p class="text-pink-200 text-[10px] sm:text-xs mb-3">The puzzle is complete.</p>
         <p class="text-yellow-300 font-press-start text-sm sm:text-base mb-4">
-          HAPPY BIRTHDAY ANGEL❤️
+          HAPPY BIRTHDAY MY BEAUTIFUL WIFE ❤️
         </p>
         <div class="flex flex-col gap-3 justify-center" :class="{ 'sm:flex-row': !isSmallScreen }">
           <button @click="unlockUniverse" class="retro-btn">UNLOCK THE VAULT</button>
