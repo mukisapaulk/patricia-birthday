@@ -65,7 +65,7 @@
     >
       <div class="retro-modal text-center">
         <h2 class="font-press-start text-lg sm:text-xl text-red-400 mb-3">GAME OVER!</h2>
-        <p class="text-pink-200 text-[10px] sm:text-xs mb-4">Time’s up! Try again?</p>
+        <p class="text-pink-200 text-[10px] sm:text-xs mb-4">Time's up! Try again?</p>
         <button @click="initGame" class="retro-btn">PLAY AGAIN</button>
       </div>
     </div>
@@ -183,48 +183,124 @@
     <div v-if="showEasterEgg" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
       <div class="retro-modal text-center">
         <h2 class="font-press-start text-lg sm:text-xl text-yellow-300 mb-3">EASTER EGG FOUND!</h2>
-        <p class="text-pink-200 text-[10px] sm:text-xs mb-4">I pray to God that all your dreams come true</p>
+        <p class="text-pink-200 text-[10px] sm:text-xs mb-4">I pray to God that all your dreams come true. love you mama liam
+        </p>
         <button @click="showEasterEgg = false" class="retro-btn">CLOSE</button>
       </div>
     </div>
   </div>
 
   <!-- Vault Screen -->
-  <div v-if="showVault" class="p-3 sm:p-4 flex flex-col items-center justify-center gap-4 galaxy-bg min-h-screen">
-    <h1 class="font-press-start text-xl sm:text-2xl text-yellow-300 mb-4">THE VAULT</h1>
-    <p class="font-press-start text-[10px] sm:text-xs text-pink-200">Enter the 6-digit PIN to unlock:</p>
-    <div class="flex gap-1 sm:gap-2 justify-center">
-      <input
-        v-for="(digit, index) in pinDigits"
-        :key="index"
-        v-model="pinDigits[index]"
-        type="text"
-        maxlength="1"
-        class="retro-select w-6 sm:w-8 text-center text-lg"
-        @input="moveToNext($event, index)"
-        @keydown.backspace="moveToPrevious($event, index)"
-      />
+  <div v-if="showVault" class="p-3 sm:p-4 flex flex-col items-center justify-center gap-4 galaxy-bg min-h-screen relative overflow-hidden">
+    <h1 class="font-press-start text-xl sm:text-2xl text-yellow-300 mb-4 z-10">THE VAULT</h1>
+    
+    <!-- PIN Input Section -->
+    <div v-if="!letterRead" class="flex flex-col items-center gap-4 z-10">
+      <p class="font-press-start text-[10px] sm:text-xs text-pink-200">Enter the 6-digit PIN to unlock:</p>
+      <div class="flex gap-1 sm:gap-2 justify-center">
+        <input
+          v-for="(digit, index) in pinDigits"
+          :key="index"
+          v-model="pinDigits[index]"
+          type="text"
+          maxlength="1"
+          class="retro-select w-6 sm:w-8 text-center text-lg"
+          @input="moveToNext($event, index)"
+          @keydown.backspace="moveToPrevious($event, index)"
+        />
+      </div>
+      <button @click="checkVaultPassword" class="retro-btn mt-4">UNLOCK</button>
+      <div class="mt-4 text-center">
+        <p class="font-press-start text-[8px] sm:text-[10px] text-pink-200">Hint 1: Starts with the day of birth (two digits)</p>
+        <p class="font-press-start text-[8px] sm:text-[10px] text-pink-200">Hint 2: Followed by the month (two digits)</p>
+        <p class="font-press-start text-[8px] sm:text-[10px] text-pink-200">Hint 3: Ends with the last two digits of the year of birth</p>
+      </div>
     </div>
-    <button @click="checkVaultPassword" class="retro-btn mt-4">UNLOCK</button>
-    <div class="mt-4 text-center">
-      <p class="font-press-start text-[8px] sm:text-[10px] text-pink-200">Hint 1: Starts with the day of birth (two digits)</p>
-      <p class="font-press-start text-[8px] sm:text-[10px] text-pink-200">Hint 2: Followed by the month (two digits)</p>
-      <p class="font-press-start text-[8px] sm:text-[10px] text-pink-200">Hint 3: Ends with the last two digits of the year of birth</p>
+
+    <!-- Reveal Bouquet Button (Appears after reading the letter) -->
+    <div v-if="letterRead && !showBouquet" class="z-20 mt-8 animate-bounce">
+      <button @click="revealBouquet" class="retro-btn text-sm !bg-gradient-to-r !from-pink-500 !to-rose-500 !border-yellow-300 !shadow-[0_0_15px_#ff4da6]">
+        💐 REVEAL BOUQUET 💐
+      </button>
     </div>
 
     <!-- Love Letter Modal -->
-    <div v-if="showLoveLetter" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-      <div class="old-paper-modal text-center">
-        <h2 class="text-lg sm:text-xl text-brown-800 mb-3">Malaika</h2>
-        <p class="text-[12px] sm:text-sm text-brown-800 mb-4">
-         I wanted to ask you for a picture, but I was a little shy, so I ended up using this one of baby Angel. When we first started talking, I honestly thought you might block me or even ask who gave me your number, but you didn’t.
-         <br>
-         Over the time we’ve been talking, I know I’ve said some awkward things (let me put it that way), but you’ve always been there for me. Even though you sometimes go quiet, you still check on me at least once a month. To you, that might seem like a small thing, but to me, it’s something huge that I truly cherish.
-         It shows the kind of person you are. kind, thoughtful, and caring. That’s a personality I really admire in you. I pray to God that you receive everything your heart desires and that you achieve all of your dreams.
-         <br>
-         Happy Birthday, Angel. May your day be as beautiful and special as you are.
+    <div v-if="showLoveLetter" class="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+      <div class="old-paper-modal text-center max-w-lg max-h-[80vh] overflow-y-auto">
+        <h2 class="text-2xl sm:text-3xl text-rose-700 mb-4 font-old-script">My wife</h2>
+        <p class="text-[14px] sm:text-base text-brown-800 mb-6 leading-relaxed font-serif">
+          i will love you forever. you are my the mother of children, my wife and partner in crime.
+          <br><br>
+          sometimes life doesnt go as planned we all get scared but i promise you i will always be there and always love you my love
+          <br><br>
+          i want us to grow old together live on our farm and never be scared of anything baby daddy loves you so much
+          <span class="text-rose-600 font-bold">Happy Birthday, mama liam. May your day be as beautiful and special as you are.</span>
         </p>
-        <button @click="showLoveLetter = false" class="retro-btn">CLOSE</button>
+        <button @click="closeLoveLetter" class="retro-btn">CLOSE LETTER</button>
+      </div>
+    </div>
+
+    <!-- Bouquet Animation -->
+    <div v-if="showBouquet" class="bouquet-container" @click="hideBouquet">
+      <div class="bouquet-wrapper">
+        <div class="bouquet-glow"></div>
+        <div class="bouquet-flowers">
+          <!-- Central Rose -->
+          <div class="flower rose center">
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="center-pistil"></div>
+          </div>
+          <!-- Surrounding Flowers -->
+          <div class="flower rose left">
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+          </div>
+          <div class="flower rose right">
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+          </div>
+          <div class="flower daisy top-left">
+            <div class="daisy-petal"></div>
+            <div class="daisy-petal"></div>
+            <div class="daisy-petal"></div>
+            <div class="daisy-petal"></div>
+            <div class="daisy-petal"></div>
+            <div class="daisy-center"></div>
+          </div>
+          <div class="flower daisy top-right">
+            <div class="daisy-petal"></div>
+            <div class="daisy-petal"></div>
+            <div class="daisy-petal"></div>
+            <div class="daisy-petal"></div>
+            <div class="daisy-petal"></div>
+            <div class="daisy-center"></div>
+          </div>
+          <!-- Baby's Breath -->
+          <div class="babys-breath bb-1"></div>
+          <div class="babys-breath bb-2"></div>
+          <div class="babys-breath bb-3"></div>
+          <div class="babys-breath bb-4"></div>
+          <div class="babys-breath bb-5"></div>
+          <!-- Leaves -->
+          <div class="leaf leaf-1"></div>
+          <div class="leaf leaf-2"></div>
+          <div class="leaf leaf-3"></div>
+          <div class="leaf leaf-4"></div>
+          <!-- Ribbon -->
+          <div class="ribbon">
+            <div class="ribbon-tail left"></div>
+            <div class="ribbon-tail right"></div>
+            <div class="ribbon-knot"></div>
+          </div>
+        </div>
+        <div class="bouquet-text font-press-start text-pink-300 text-xs mt-4 text-center drop-shadow-[0_0_10px_#ff4da6]">
+          For You, my love 🌹
+        </div>
+        <p class="text-[10px] text-pink-200 mt-2 animate-pulse">Click anywhere to hide</p>
       </div>
     </div>
   </div>
@@ -235,7 +311,7 @@ import { ref, reactive, nextTick, onMounted, onUnmounted, watch } from 'vue'
 
 const board = ref(null)
 const gridSize = ref(3)
-const defaultImage = '/angel.jpg' // put your picture in /public
+const defaultImage = '/patricia.jpg'
 const boardSize = ref(window.innerWidth < 640 ? Math.min(window.innerWidth - 32, 320) : 360)
 const tiles = reactive([])
 const selected = ref(null)
@@ -273,11 +349,13 @@ const showEasterEgg = ref(false)
 const showVault = ref(false)
 const pinDigits = ref(['', '', '', '', '', ''])
 const showLoveLetter = ref(false)
+const letterRead = ref(false)
+const showBouquet = ref(false)
 
 const loveNotes = [
   'Your laugh is my favorite 8-bit melody! 🎵',
   'You make every level of life an adventure! 🌟',
-  'My heart glitches every time you’re near! ❤️'
+  'My heart glitches every time you\'re near! ❤️'
 ]
 
 // Puzzle Game Logic
@@ -411,11 +489,27 @@ function unlockUniverse() {
 
 function checkVaultPassword() {
   const pin = pinDigits.value.join('')
-  if (pin === '260902') {
+  if (pin === '140202') {
     showLoveLetter.value = true
   } else {
     alert('Incorrect PIN! Try again.')
   }
+}
+
+function closeLoveLetter() {
+  showLoveLetter.value = false
+  letterRead.value = true
+}
+
+function revealBouquet() {
+  showBouquet.value = true
+  setTimeout(() => {
+    if (showBouquet.value) showBouquet.value = false
+  }, 10000)
+}
+
+function hideBouquet() {
+  showBouquet.value = false
 }
 
 function moveToNext(event, index) {
@@ -629,7 +723,7 @@ function generateMaze() {
     } while (maze[ey][ex] !== 0 || (ex === px && ey === py))
     easterEggPosition = { x: ex * cellSize, y: ey * cellSize }
   } else {
-    easterEggPosition = { x: -100, y: -100 } // Off-screen when not in level 4
+    easterEggPosition = { x: -100, y: -100 }
   }
 }
 
@@ -1082,6 +1176,305 @@ onUnmounted(() => {
   animation: blink 1.2s infinite;
 }
 
+/* Bouquet Animation Styles */
+.bouquet-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  background: radial-gradient(circle at center bottom, rgba(255, 77, 166, 0.2), transparent 70%);
+  animation: fadeIn 0.5s ease-out;
+  cursor: pointer;
+}
+
+.bouquet-wrapper {
+  position: relative;
+  width: 300px;
+  height: 500px;
+  animation: riseUp 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  transform-origin: bottom center;
+}
+
+@keyframes riseUp {
+  0% {
+    transform: translateY(100%) scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-10%) scale(1.05);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.bouquet-glow {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 77, 166, 0.4), transparent 70%);
+  filter: blur(20px);
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.6; }
+  50% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+}
+
+.bouquet-flowers {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+}
+
+/* Rose Styles */
+.flower.rose {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+}
+
+.flower.rose.center {
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.flower.rose.left {
+  bottom: 120px;
+  left: 20%;
+  transform: rotate(-20deg) scale(0.8);
+  z-index: 5;
+}
+
+.flower.rose.right {
+  bottom: 120px;
+  right: 20%;
+  transform: rotate(20deg) scale(0.8);
+  z-index: 5;
+}
+
+.petal {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ff1a6d, #ff4da6);
+  border-radius: 50% 50% 50% 0;
+  transform-origin: bottom left;
+  box-shadow: inset -2px -2px 4px rgba(0,0,0,0.2);
+}
+
+.flower.rose .petal:nth-child(1) {
+  transform: rotate(0deg) translate(10px, 10px);
+  background: linear-gradient(135deg, #ff0066, #ff3388);
+}
+
+.flower.rose .petal:nth-child(2) {
+  transform: rotate(72deg) translate(10px, 10px);
+  background: linear-gradient(135deg, #ff1a75, #ff4d94);
+}
+
+.flower.rose .petal:nth-child(3) {
+  transform: rotate(144deg) translate(10px, 10px);
+  background: linear-gradient(135deg, #ff3388, #ff66aa);
+}
+
+.center-pistil {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, #ffd700, #ffaa00);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+/* Daisy Styles */
+.flower.daisy {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+}
+
+.flower.daisy.top-left {
+  bottom: 160px;
+  left: 15%;
+  transform: rotate(-30deg) scale(0.7);
+}
+
+.flower.daisy.top-right {
+  bottom: 160px;
+  right: 15%;
+  transform: rotate(30deg) scale(0.7);
+}
+
+.daisy-petal {
+  position: absolute;
+  width: 25px;
+  height: 8px;
+  background: linear-gradient(90deg, #fff5e6, #ffffff);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.daisy-petal:nth-child(1) { transform: translate(-50%, -50%) rotate(0deg) translateX(15px); }
+.daisy-petal:nth-child(2) { transform: translate(-50%, -50%) rotate(72deg) translateX(15px); }
+.daisy-petal:nth-child(3) { transform: translate(-50%, -50%) rotate(144deg) translateX(15px); }
+.daisy-petal:nth-child(4) { transform: translate(-50%, -50%) rotate(216deg) translateX(15px); }
+.daisy-petal:nth-child(5) { transform: translate(-50%, -50%) rotate(288deg) translateX(15px); }
+
+.daisy-center {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: radial-gradient(circle, #ffcc00, #ff9900);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Baby's Breath */
+.babys-breath {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #ffffff, #e6e6fa);
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(255,255,255,0.8);
+}
+
+.bb-1 { bottom: 140px; left: 35%; animation: float 3s ease-in-out infinite; }
+.bb-2 { bottom: 180px; left: 45%; animation: float 3s ease-in-out infinite 0.5s; }
+.bb-3 { bottom: 150px; right: 35%; animation: float 3s ease-in-out infinite 1s; }
+.bb-4 { bottom: 190px; left: 25%; animation: float 3s ease-in-out infinite 1.5s; }
+.bb-5 { bottom: 170px; right: 25%; animation: float 3s ease-in-out infinite 2s; }
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Leaves */
+.leaf {
+  position: absolute;
+  width: 40px;
+  height: 60px;
+  background: linear-gradient(135deg, #228b22, #006400);
+  border-radius: 0 100% 0 100%;
+  opacity: 0.9;
+}
+
+.leaf-1 {
+  bottom: 80px;
+  left: 30%;
+  transform: rotate(-45deg);
+}
+
+.leaf-2 {
+  bottom: 80px;
+  right: 30%;
+  transform: rotate(45deg) scaleX(-1);
+}
+
+.leaf-3 {
+  bottom: 60px;
+  left: 40%;
+  transform: rotate(-30deg) scale(0.8);
+}
+
+.leaf-4 {
+  bottom: 60px;
+  right: 40%;
+  transform: rotate(30deg) scaleX(-1) scale(0.8);
+}
+
+/* Ribbon */
+.ribbon {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+
+.ribbon-knot {
+  width: 30px;
+  height: 20px;
+  background: linear-gradient(135deg, #ff1493, #ff69b4);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.ribbon-tail {
+  position: absolute;
+  width: 20px;
+  height: 60px;
+  background: linear-gradient(135deg, #ff1493, #ff69b4);
+  top: 10px;
+  border-radius: 0 0 50% 50%;
+}
+
+.ribbon-tail.left {
+  left: -15px;
+  transform: rotate(-20deg);
+  animation: ribbonWaveLeft 2s ease-in-out infinite;
+}
+
+.ribbon-tail.right {
+  right: -15px;
+  transform: rotate(20deg);
+  animation: ribbonWaveRight 2s ease-in-out infinite;
+}
+
+@keyframes ribbonWaveLeft {
+  0%, 100% { transform: rotate(-20deg); }
+  50% { transform: rotate(-30deg); }
+}
+
+@keyframes ribbonWaveRight {
+  0%, 100% { transform: rotate(20deg); }
+  50% { transform: rotate(30deg); }
+}
+
+.bouquet-text {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  text-shadow: 0 0 20px #ff4da6, 0 0 40px #ff4da6;
+  animation: textGlow 2s ease-in-out infinite;
+}
+
+@keyframes textGlow {
+  0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+  50% { opacity: 0.8; transform: translateX(-50%) scale(1.05); }
+}
+
 /* Responsive Adjustments */
 @media (max-width: 360px) {
   .retro-btn {
@@ -1095,6 +1488,13 @@ onUnmounted(() => {
   }
   .retro-modal {
     padding: 0.8rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .bouquet-wrapper {
+    transform: scale(0.8);
+    transform-origin: bottom center;
   }
 }
 </style>
